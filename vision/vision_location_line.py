@@ -21,9 +21,10 @@ def fit_line(points):
 
 def find_lane_middle(image,mode = 'test'):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 100, 200, apertureSize=3)
+    _, binary = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
+    edges = cv2.Canny(binary, 10, 200, apertureSize=3)
     cv2.imshow('Canny Edge', edges)
-    lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=300, maxLineGap=10)
+    lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=250, maxLineGap=10)
     left_fit = None  # 添加默认值
     right_fit = None  # 添加默认值
 
@@ -117,12 +118,25 @@ dim = (width, height)
 # 缩放图像
 resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
 
+height, width, _ = resized.shape
+
+# 计算中间30%区域的坐标
+cut_persent = 0.5
+start_height = int(height * (1-cut_persent)/2)
+end_height = int(height * 1-(1-cut_persent)/2)
+start_width = 0
+end_width = width
+cropped_image = resized[start_height:end_height, start_width:end_width]
 # 调用函数找到车道中间位置
-middle = find_lane_middle(resized)
-print(f"Lane Middle: {middle[1]} \nImg Midlle: {resized.shape[1]/2}")
+middle = find_lane_middle(cropped_image)
+if middle is not None:
+    print(f"Lane Middle: {middle[1]}")
+else:
+    print("Lane Middle: Not Found")
+print(f"Img Midlle: {cropped_image.shape[1]/2}")
 
 # 显示结果
 # 显示缩放后的图像
-cv2.imshow('Lane Middle', resized)
+cv2.imshow('Lane Middle', cropped_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

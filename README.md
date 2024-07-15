@@ -28,5 +28,7 @@ python == 3.10.11
 
 # 快速开始
 ```shell
-视觉定位测试：python ./vision/vision_location.py
+视觉边线定位测试：python ./vision/vision_location_line.py #已弃用
+视觉特征匹配测试：python ./vision/vision_detection.py #开发中
+视觉点定位测试：python ./vision/vision_location_point.py
 ```
