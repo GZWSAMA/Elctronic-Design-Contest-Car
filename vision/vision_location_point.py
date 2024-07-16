@@ -32,8 +32,11 @@ class Vision_Location_Point:
         x = points[:, 0]
         y = points[:, 1]
         
-        # 初始猜测
-        p_init = np.polyfit(x, y, 1)
+        try:
+            p_init = np.polyfit(x, y, 1)
+        except Exception as e:
+            # 处理拟合失败的情况
+            return None
         
         # 使用最小二乘法优化直线参数
         result = least_squares(error, p_init, args=(x, y))
@@ -65,6 +68,7 @@ class Vision_Location_Point:
         
         # 返回找到的黑色像素的位置
         return [(left_black_x, H),(right_black_x, H)]
+
     def find_lane_middle(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         _, binary = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
@@ -73,7 +77,7 @@ class Vision_Location_Point:
 
         line_points_1 = self.find_nearest_black_pixels(binary, 0.65)
         line_points_2 = self.find_nearest_black_pixels(binary, 0.6)
-        if line_points_1 is None or line_points_2 is None:
+        if line_points_1[0] is None or line_points_1[1] is None or line_points_2[0] is None or line_points_2[1] is None:
             return None
         right_lines.append([line_points_1[1], line_points_2[1]])
         left_lines.append([line_points_1[0], line_points_2[0]])

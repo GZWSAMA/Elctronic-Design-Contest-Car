@@ -1,49 +1,40 @@
 import cv2
-import numpy as np
+from vision.vision_detction_coutour import Vision_Detection_Contour as VD
 
-def pre_process(image):
-        # 在显示图像前进行缩放
-    scale_percent = 10  # 缩放比例
-    width = int(image.shape[1] * scale_percent / 100)
-    height = int(image.shape[0] * scale_percent / 100)
-    dim = (width, height)
+vd = VD('test')
 
-    # 缩放图像
-    resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
-    return resized
+image_arrow = cv2.imread('./datas/4.png')
+gray = cv2.cvtColor(image_arrow, cv2.COLOR_BGR2GRAY)
 
-def detect_heptagon(image_path):
-    # 读取图像
-    img = cv2.imread(image_path)
-    img = pre_process(img)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    # 边缘检测
-    edges = cv2.Canny(gray, 50, 150, apertureSize=3)
-    
-    # 查找轮廓
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # 遍历所有轮廓
-    for cnt in contours:
-        # 近似轮廓
-        epsilon = 0.02 * cv2.arcLength(cnt, True)
-        approx = cv2.approxPolyDP(cnt, epsilon, True)
-        
-        # 检查近似轮廓是否为七边形
-        if len(approx) == 7:
-            # 绘制轮廓
-            cv2.drawContours(img, [approx], 0, (0, 255, 0), 3)
-            
-            # 打印七边形的坐标
-            print("Heptagon Detected:")
-            for point in approx:
-                print(point[0])
-    
-    # 显示结果
-    cv2.imshow('Heptagon Detection', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
-# 调用函数
-detect_heptagon('./datas/detection_test.jpg')
+# 应用高斯模糊减少噪声
+blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+# 边缘检测
+edges = cv2.Canny(blurred, 50, 150, apertureSize=3)
+
+# 查找轮廓
+contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+max_area = 0
+largest_heptagon = None
+
+# 遍历所有轮廓
+for cnt in contours:
+    # 近似轮廓
+    epsilon = 0.02 * cv2.arcLength(cnt, True)
+    approx = cv2.approxPolyDP(cnt, epsilon, True)
+    cv2.drawContours(image_arrow, [cnt], 0, (0, 255, 0), 3)
+    
+    # 检查近似轮廓是否为七边形
+    if len(approx) == 7 and cv2.contourArea(approx) > 1000:
+        area = cv2.contourArea(approx)
+        if area > max_area:
+            max_area = area
+            largest_heptagon = approx
+
+# 如果找到了七边形
+if largest_heptagon is not None:
+    # 绘制最大面积的七边形
+    cv2.drawContours(image_arrow, [largest_heptagon], 0, (0, 0, 255), 3)
+cv2.imshow("image_arrow", image_arrow)
+cv2.waitKey(0)
