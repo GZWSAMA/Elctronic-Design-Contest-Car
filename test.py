@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from vision.vision_location_point import Vision_Location_Point as VL
 from vision.vision_detction_coutour import Vision_Detection_Contour as VD
-from general.preprocess import pre_process
+from general.tools import pre_process
 
 def capture_image(cap):
     if cap == 'cap1':
