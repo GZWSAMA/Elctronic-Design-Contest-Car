@@ -40,9 +40,12 @@ def capture_image(cap):
 def send_list_over_serial(command, data_list):
     try:
         if ser.isOpen():
-            # 将列表转换为字符串，使用逗号作为分隔符
-            # 使用str()函数确保所有元素都被转换为字符串
-            data_str = ','.join(map(str, data_list))
+            if isinstance(data, list):
+                # 如果是列表，将其转换为字符串，使用逗号作为分隔符
+                data_str = ','.join(map(str, data))
+            else:
+                # 如果不是列表，则直接使用数据（假设它是一个字符串）
+                data_str = data
             
             # 将字符串编码为字节串
             data_bytes = (command + data_str + '\r\n').encode('utf-8')
@@ -61,7 +64,7 @@ def run():
     try:
         vs = VS(mode = mode)#mode：test会产生效果图；run不会产生效果图
         ax = AX()
-
+        state = 'F'
         while True:
             image_line = capture_image(cap = 'cap1')
             if cap_mode == 'one':
@@ -83,8 +86,8 @@ def run():
             # 调用函数找到车道中间位置
             vl.find_lane_middle(processed_image_line)
             vd.detect_largest_heptagon(processed_image_arrow)
-            if vd.left_point == vd.vision_middle:
-                send_list_over_serial('A', 'T')
+            if state == 'F' or vd.left_point <= vd.vision_middle:
+                state = 'T'
             if ser.in_waiting > 0:
                 # 读取一行数据
                 line = ser.readline().decode('utf-8').strip()
@@ -100,6 +103,10 @@ def run():
                         send_list_over_serial(command, 'N')
                     else:
                         send_list_over_serial(command, int(select_point(vl.line_middle)))
+                elif command == "A":
+                    send_list_over_serial(command, state)           
+                elif command == "R":
+                    state = 'F'
                 else:
                     print(f"Invalid command{command}")
     except KeyboardInterrupt:
