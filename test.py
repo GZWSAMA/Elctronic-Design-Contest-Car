@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from vision.vision_location_point import Vision_Location_Point as VL
 from vision.vision_detction_coutour import Vision_Detection_Contour as VD
-from general.tools import pre_process
+from general.tools import pre_process, select_point
 
 def capture_image(cap):
     if cap == 'cap1':
@@ -64,7 +64,7 @@ def run(mode, cap):
         vl.find_lane_middle(processed_image_line)
         vd.detect_largest_heptagon(processed_image_arrow)
         if vl.line_middle is not None:
-            print(f"Lane Middle: {vl.line_middle}")
+            print(f"Lane Middle: {select_point(vl.line_middle)}")
         else:
             print("Lane Middle: Not Found")
         print(f"Img Midlle: {vl.vision_middle}")
@@ -74,8 +74,8 @@ def run(mode, cap):
         else:
             print("Left Point: Not Found")
 
-        显示结果
-        显示缩放后的图像
+        # 显示结果
+        # 显示缩放后的图像
         if mode == 'test':
             cv2.imshow('Lane Middle', processed_image_line)
             cv2.imshow('Arrow', processed_image_arrow)

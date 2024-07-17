@@ -1,47 +1,57 @@
 import cv2
 import numpy as np
 
-def update_threshold(val):
-    # 获取当前滑动条的值作为阈值
-    threshold = val
-    
-    # 应用阈值处理
-    _, binary = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
-    
-    # 显示二值化图像
+def capture_image(cap):
+    if cap == 'cap1':
+        ret, frame = cap1.read()
+    elif cap == 'cap2':
+        ret, frame = cap2.read()
+    else:
+        print("Invalid camera")
+        return None
+    return frame if ret else None
+
+def update_threshold(gray, val):
+    _, binary = cv2.threshold(gray, val, 255, cv2.THRESH_BINARY)
     cv2.imshow('Binary Image', binary)
 
-# 加载图像
-image = cv2.imread('./datas/line2.jpg')
-scale_percent = 50  # 缩放比例
-width = int(image.shape[1] * scale_percent / 100)
-height = int(image.shape[0] * scale_percent / 100)
-dim = (width, height)
+cap1 = cv2.VideoCapture(0)
+cap2 = cv2.VideoCapture(1)  # Initialize cap2 even if it's not used
 
-# 缩放图像
-resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
-
-# 将图像转换为灰度图
-gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
-cv2.imshow('gray Image', gray)
-
-# 创建窗口并命名
 cv2.namedWindow('Binary Image')
 
-# 创建滑动条并绑定到窗口
-cv2.createTrackbar('Threshold', 'Binary Image', 0, 255, update_threshold)
+# 由于cv2.createTrackbar的限制，我们使用lambda函数来包装update_threshold，
+# 这样可以传递额外的参数gray
+current_gray = None  # 定义一个全局变量来存储当前的gray图像
 
-# 设置滑动条的默认值
+def set_current_gray(gray):
+    global current_gray
+    current_gray = gray
+
+cv2.createTrackbar('Threshold', 'Binary Image', 0, 255, lambda val: update_threshold(current_gray, val) if current_gray is not None else None)
 cv2.setTrackbarPos('Threshold', 'Binary Image', 127)
 
-# 初始显示
-update_threshold(127)
-
-# 主循环
 while True:
+    image = capture_image('cap1')
+    if image is None:
+        break
+    
+    scale_percent = 50
+    width = int(image.shape[1] * scale_percent / 100)
+    height = int(image.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    
+    resized = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+    gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
+    cv2.imshow('gray Image', gray)
+    
+    # 更新全局变量current_gray
+    set_current_gray(gray)
+    
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
 
-# 清理
+cap1.release()
+cap2.release()
 cv2.destroyAllWindows()

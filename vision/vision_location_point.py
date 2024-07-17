@@ -72,7 +72,8 @@ class Vision_Location_Point:
 
     def find_lane_middle(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, binary = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
+        _, binary = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY)
+        cv2.imshow("Binary Image", binary)
         right_lines = []
         left_lines = []
 
@@ -125,12 +126,13 @@ class Vision_Location_Point:
             if self.mode == 'test':
                 cv2.line(image, (middle_top, 0), (middle_bottom, image.shape[0]), (0, 255, 0), 10)
             
-            if len(self.line_middle) >= self.line_threshold:
-                # 删除最旧的一组数据
-                self.line_middle.pop(0)
+            if self.line_middle is not None:
+                if len(self.line_middle) >= self.line_threshold:
+                    # 删除最旧的一组数据
+                    self.line_middle.pop(0)
 
-            # 添加新的坐标对
-            self.line_middle.append(middle_bottom)
+                # 添加新的坐标对
+                self.line_middle.append(middle_bottom)
             self.vision_middle = image.shape[1]/2
         else:
             print("No lane found")
