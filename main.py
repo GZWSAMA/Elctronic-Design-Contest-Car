@@ -62,8 +62,6 @@ def run(mode, cap_mode):
     vl = VL(mode = mode)
     vd = VD(mode = mode)
     try:
-        vs = VS(mode = mode)#mode：test会产生效果图；run不会产生效果图
-        ax = AX()
         state = 'F'
         while True:
             image_line = capture_image(cap = 'cap1')
