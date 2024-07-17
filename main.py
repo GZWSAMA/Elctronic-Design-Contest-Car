@@ -58,7 +58,7 @@ def send_list_over_serial(command, data_list):
     except Exception as e:
         print(f"发生错误: {e}")
 
-def run():
+def run(mode, cap_mode):
     vl = VL(mode = mode)
     vd = VD(mode = mode)
     try:
