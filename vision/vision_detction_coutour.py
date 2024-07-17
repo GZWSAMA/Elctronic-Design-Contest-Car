@@ -5,6 +5,7 @@ class Vision_Detection_Contour:
     def __init__(self, mode):
         self.mode = mode
         self.left_point = None
+        self.vision_middle = None
     def pre_process(self, image):
         # 在显示图像前进行缩放
         scale_percent = 10  # 缩放比例
@@ -29,7 +30,7 @@ class Vision_Detection_Contour:
         
         max_area = 0
         largest_heptagon = None
-        
+        self.vision_middle = img.shape[1]/2
         # 遍历所有轮廓
         for cnt in contours:
             # 近似轮廓

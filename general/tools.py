@@ -9,3 +9,10 @@ def pre_process(image, scale_percent):
         # 缩放图像
         resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
         return resized
+
+def select_point(points):
+        final_point = None
+        for i in range(len(points)):
+            if points[len(points)-1 - i][0] != 0.0 or points[len(points)-1 - i][1] != 0.0:
+                final_point = points[len(points)-1 - i]
+        return final_point

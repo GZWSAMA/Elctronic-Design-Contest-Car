@@ -52,9 +52,11 @@ def run(mode, cap):
         if image_line is None or image_arrow is None:
             print("Image is empty!")
             continue
-        cv2.imshow("image_line", image_line)
-        cv2.imshow("image_arrow", image_arrow)
-        cv2.waitKey(10)
+        
+        if mode == 'test':
+            cv2.imshow("image_line", image_line)
+            cv2.imshow("image_arrow", image_arrow)
+            cv2.waitKey(10)
 
         processed_image_line = pre_process(image_line, scale_percent=1)
         processed_image_arrow = pre_process(image_arrow, scale_percent=1)

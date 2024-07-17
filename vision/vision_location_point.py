@@ -12,6 +12,7 @@ class Vision_Location_Point:
         self.line_middle = None
         self.vision_middle = None
         self.mode = mode
+        self.line_threshold = 10
     def pre_process(self, image):
             # 在显示图像前进行缩放
         scale_percent = 0.5 # 缩放比例
@@ -124,7 +125,12 @@ class Vision_Location_Point:
             if self.mode == 'test':
                 cv2.line(image, (middle_top, 0), (middle_bottom, image.shape[0]), (0, 255, 0), 10)
             
-            self.line_middle = middle_bottom
+            if len(self.line_middle) >= self.line_threshold:
+                # 删除最旧的一组数据
+                self.line_middle.pop(0)
+
+            # 添加新的坐标对
+            self.line_middle.append(middle_bottom)
             self.vision_middle = image.shape[1]/2
         else:
             print("No lane found")
