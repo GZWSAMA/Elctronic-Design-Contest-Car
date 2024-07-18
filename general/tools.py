@@ -14,7 +14,7 @@ def select_point(points):
         final_point = None
         if isinstance(points, list) and len(points) > 1:
             for i in range(len(points)):
-                if points[len(points)-1 - i][0] != 0.0 or points[len(points)-1 - i][1] != 0.0:
+                if points[len(points)-1 - i] != 0.0:
                     final_point = points[len(points)-1 - i]        
         else:
             final_point = points

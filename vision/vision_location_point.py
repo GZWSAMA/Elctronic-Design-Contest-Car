@@ -13,6 +13,7 @@ class Vision_Location_Point:
         self.vision_middle = None
         self.mode = mode
         self.line_threshold = 10
+        self.flag = False
     def pre_process(self, image):
             # 在显示图像前进行缩放
         scale_percent = 0.5 # 缩放比例
@@ -72,7 +73,7 @@ class Vision_Location_Point:
 
     def find_lane_middle(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, binary = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY)
+        _, binary = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
         cv2.imshow("Binary Image", binary)
         right_lines = []
         left_lines = []
@@ -126,6 +127,9 @@ class Vision_Location_Point:
             if self.mode == 'test':
                 cv2.line(image, (middle_top, 0), (middle_bottom, image.shape[0]), (0, 255, 0), 10)
             
+            if self.flag is False and middle_bottom is not None: 
+                self.line_middle = [0.0, 0.0, 0.0]               
+                self.flag = True
             if self.line_middle is not None:
                 if len(self.line_middle) >= self.line_threshold:
                     # 删除最旧的一组数据

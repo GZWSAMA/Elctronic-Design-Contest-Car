@@ -41,25 +41,24 @@ def run(mode, cap):
     vd = VD(mode = mode)
     while True:
         # 加载图像或视频帧
-        # image_line = cv2.imread('./datas/line2.jpg')
-        # image_arrow = cv2.imread('./datas/detection_test.jpg')
-        image_line = capture_image(cap = 'cap1')
-        if cap_mode == 'one':
-            image_arrow = capture_image(cap = 'cap1')
-        else:
-            image_arrow = capture_image(cap = 'cap2')
+        image_line = cv2.imread('./datas/line2.jpg')
+        image_arrow = cv2.imread('./datas/detection_test.jpg')
+        # image_line = capture_image(cap = 'cap1')
+        # if cap_mode == 'one':
+        #     image_arrow = capture_image(cap = 'cap1')
+        # else:
+        #     image_arrow = capture_image(cap = 'cap2')
 
         if image_line is None or image_arrow is None:
             print("Image is empty!")
             continue
-        
-        if mode == 'test':
-            cv2.imshow("image_line", image_line)
-            cv2.imshow("image_arrow", image_arrow)
-            cv2.waitKey(10)
 
-        processed_image_line = pre_process(image_line, scale_percent=1)
-        processed_image_arrow = pre_process(image_arrow, scale_percent=1)
+        processed_image_line = pre_process(image_line, scale_percent=0.5)
+        processed_image_arrow = pre_process(image_arrow, scale_percent=0.2)
+        if mode == 'test':
+            cv2.imshow("image_line", processed_image_line)
+            cv2.imshow("image_arrow", processed_image_arrow)
+            cv2.waitKey(10)
         # 调用函数找到车道中间位置
         vl.find_lane_middle(processed_image_line)
         vd.detect_largest_heptagon(processed_image_arrow)
